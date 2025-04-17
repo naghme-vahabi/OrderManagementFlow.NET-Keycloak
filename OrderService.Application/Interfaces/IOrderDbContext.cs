@@ -1,5 +1,4 @@
-﻿using CustomerService.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerService.Application.Interfaces
+namespace OrderService.Application.Interfaces
 {
-    public interface ICustomerDbContext
+    public interface IOrderDbContext
     {
-        DbSet<Customer> Customers { get; set; }
+        DbSet<Order> Orders { get; set; }
+        DbSet<OrderItem> OrderItems { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         int SaveChanges();
     }
