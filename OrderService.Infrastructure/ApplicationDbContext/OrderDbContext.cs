@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Application.Interfaces;
 using OrderService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+using OrderService.Infrastructure.Persistence.Interceptors;
+using System.Reflection;
+
 
 namespace OrderService.Infrastructure.ApplicationDbContext
 {
@@ -19,7 +16,13 @@ namespace OrderService.Infrastructure.ApplicationDbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             modelBuilder.Entity<Order>().OwnsMany(o => o.Items);
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.AddInterceptors(new AuditableEntityInterceptor());
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

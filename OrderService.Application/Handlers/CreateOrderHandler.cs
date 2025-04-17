@@ -1,9 +1,9 @@
 ﻿using MassTransit;
 using MediatR;
 using OrderService.Application.Commands;
-using OrderService.Application.Events;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Interfaces;
+using Shared.Events.Shared.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +45,6 @@ namespace OrderService.Application.Handlers
                 OrderId = order.Id,
                 TotalAmount = order.TotalAmount
             });
-
             return order.Id;
         }
     }

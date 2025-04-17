@@ -1,10 +1,12 @@
 ﻿using CustomerService.Application.Commands;
 using CustomerService.Application.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerService.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CustomersController : ControllerBase

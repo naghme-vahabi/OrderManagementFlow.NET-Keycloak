@@ -4,51 +4,71 @@ using OrderService.Domain.Interfaces;
 using MassTransit;
 using OrderService.Infrastructure.Repositories;
 using OrderService.Application.Handlers;
-using CustomerService.Domain.Interfaces;
 using OrderService.Application.Interfaces;
+using OrderService.API.Middlewares;
+using OrderService.Infrastructure.Persistence.Interceptors;
+using OrderService.Application;
+using OrderService.Infrastructure;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddDbContext<OrderDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IOrderDbContext>(provider =>
-    provider.GetRequiredService<OrderDbContext>());
-
-builder.Services.AddScoped<IOrderRepository>(provider =>
-     new OrderRepository(provider.GetRequiredService<IOrderDbContext>(), CancellationToken.None));
-
-builder.Services.AddMassTransit(x =>
-{
-    x.UsingRabbitMq((ctx, cfg) =>
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
     {
-        cfg.Host("rabbitmq", "/", h => {
-            h.Username("guest");
-            h.Password("guest");
-        });
+        options.Authority = builder.Configuration["Keycloak:Authority"];
+        options.RequireHttpsMetadata = false;
+        options.Audience = builder.Configuration["Keycloak:Audience"];
     });
-});
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateOrderHandler>());
-
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Add Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Order Service API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
