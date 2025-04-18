@@ -42,7 +42,7 @@ services:
 
   orderservice:
     build:
-      context: ./Services/OrderService.API
+      context: ./Services/OrderService/OrderService.API
     container_name: orderservice
     ports:
       - "5001:80"
@@ -57,7 +57,7 @@ services:
 
   paymentservice:
     build:
-      context: ./Services/PaymentService.API
+      context: ./Services/PaymentService/PaymentService.API
     container_name: paymentservice
     ports:
       - "5002:80"
@@ -72,7 +72,7 @@ services:
 
   customerservice:
     build:
-      context: ./Services/CustomerService.API
+      context: ./Services/CustomerService/CustomerService.API
     container_name: customerservice
     ports:
       - "5003:80"
