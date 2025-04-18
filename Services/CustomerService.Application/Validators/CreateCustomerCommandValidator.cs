@@ -1,0 +1,24 @@
+﻿using CustomerService.Application.Commands;
+using FluentValidation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CustomerService.Application.Validators
+{
+    public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>
+    {
+        public CreateCustomerCommandValidator()
+        {
+            RuleFor(x => x.FullName)
+                .NotEmpty().WithMessage("نام الزامی است.")
+                .MinimumLength(3).WithMessage("نام باید حداقل ۳ حرف باشد.");
+
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("ایمیل الزامی است.")
+                .EmailAddress().WithMessage("فرمت ایمیل نادرست است.");
+        }
+    }
+}
