@@ -9,7 +9,12 @@ namespace OrderService.Infrastructure.ApplicationDbContext
 {
     public class OrderDbContext : DbContext, IOrderDbContext
     {
-        public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) { }
+        private readonly AuditableEntityInterceptor _auditableEntityInterceptor;
+        public OrderDbContext(DbContextOptions<OrderDbContext> options,
+        AuditableEntityInterceptor auditableEntityInterceptor) : base(options)
+        {
+            _auditableEntityInterceptor = auditableEntityInterceptor;
+        }
 
         public DbSet<Order> Orders { get ; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
@@ -21,7 +26,7 @@ namespace OrderService.Infrastructure.ApplicationDbContext
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.AddInterceptors(new AuditableEntityInterceptor());
+            optionsBuilder.AddInterceptors(_auditableEntityInterceptor);
             base.OnConfiguring(optionsBuilder);
         }
     }

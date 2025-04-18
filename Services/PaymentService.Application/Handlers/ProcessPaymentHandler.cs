@@ -1,12 +1,7 @@
 ﻿using MassTransit;
 using MediatR;
 using PaymentService.Application.Commands;
-using PaymentService.Application.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Shared.Events.Shared.Events;
 
 namespace PaymentService.Application.Handlers
 {
@@ -21,8 +16,8 @@ namespace PaymentService.Application.Handlers
 
         public async Task Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
         {
-            //TODO: Payment Process
-            await Task.Delay(500); // simulate payment
+            //TODO: simulate payment
+            await Task.Delay(500);
 
             await _publish.Publish(new OrderCreatedEvent
             {
