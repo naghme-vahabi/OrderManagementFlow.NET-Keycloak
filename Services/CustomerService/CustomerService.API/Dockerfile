@@ -1,33 +1,29 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
+﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
 
-
-# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["CustomerService.API/CustomerService.API.csproj", "CustomerService.API/"]
-COPY ["CustomerService.Infrastructure/CustomerService.Infrastructure.csproj", "CustomerService.Infrastructure/"]
-COPY ["CustomerService.Application/CustomerService.Application.csproj", "CustomerService.Application/"]
-COPY ["CustomerService.Domain/CustomerService.Domain.csproj", "CustomerService.Domain/"]
-COPY ["OrderService.Domain/OrderService.Domain.csproj", "OrderService.Domain/"]
+
+
+COPY ../../../../Shared ./Shared
+COPY ../CustomerService.Application ./CustomerService.Application
+COPY ../CustomerService.Domain ./CustomerService.Domain
+COPY ../CustomerService.Infrastructure ./CustomerService.Infrastructure
+COPY . ./CustomerService.API
+COPY ../../OrderService/OrderService.Domain ./OrderService.Domain
+
+
 RUN dotnet restore "./CustomerService.API/CustomerService.API.csproj"
-COPY . .
+
+
 WORKDIR "/src/CustomerService.API"
-RUN dotnet build "./CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
