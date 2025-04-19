@@ -13,16 +13,15 @@ namespace CustomerService.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<CustomerDbContext>(options =>
-            options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
             services.AddScoped<ICustomerDbContext>(provider => provider.GetRequiredService<CustomerDbContext>());
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+
             services.AddScoped<AuditableEntityInterceptor>();
 
-
-            services.AddScoped<ICustomerRepository>(provider =>
-                 new CustomerRepository(provider.GetRequiredService<ICustomerDbContext>(), CancellationToken.None));
-
             services.AddHttpContextAccessor();
+
             return services;
         }
     }

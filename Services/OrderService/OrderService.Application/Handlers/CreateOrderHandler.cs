@@ -3,12 +3,7 @@ using MediatR;
 using OrderService.Application.Commands;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Interfaces;
-using Shared.Events.Shared.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Shared.Events;
 
 namespace OrderService.Application.Handlers
 {
@@ -28,17 +23,17 @@ namespace OrderService.Application.Handlers
             {
                 Id = Guid.NewGuid(),
                 CustomerId = request.CustomerId,
-                Items = request.Items.Select(i => new Domain.Entities.OrderItem
+                Items = request.Items.Select(i => new OrderItem
                 {
                     Id = Guid.NewGuid(),
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
-                    Price = i.Price 
+                    Price = i.Price
                 }).ToList()
             };
             order.TotalAmount = order.Items.Sum(x => x.Price * x.Quantity);
 
-            await _orderRepository.AddAsync(order);
+            await _orderRepository.AddAsync(order, cancellationToken);
 
             await _publish.Publish(new OrderCreatedEvent
             {

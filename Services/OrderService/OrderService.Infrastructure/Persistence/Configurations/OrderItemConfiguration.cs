@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrderService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderService.Infrastructure.Persistence.Configurations
 {
@@ -20,8 +15,12 @@ namespace OrderService.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.Property(i => i.Price)
-                .HasPrecision(9,2)
+                .HasPrecision(9, 2)
                 .IsRequired();
+            builder.HasOne(x => x.Order)
+                .WithMany(x => x.Items)
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

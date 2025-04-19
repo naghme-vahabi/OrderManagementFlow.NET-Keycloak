@@ -1,29 +1,39 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+# Base image for running the app
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 80
+EXPOSE 8080
+EXPOSE 8081
 
+# Optional: install tools (if needed)
+RUN apt-get update && apt-get install -y git
+
+# Build image
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
+# Copy project files first for faster docker cache usage
+COPY Services/CustomerService/CustomerService.API/CustomerService.API.csproj Services/CustomerService/CustomerService.API/
+COPY Services/CustomerService/CustomerService.Infrastructure/CustomerService.Infrastructure.csproj Services/CustomerService/CustomerService.Infrastructure/
+COPY Services/CustomerService/CustomerService.Application/CustomerService.Application.csproj Services/CustomerService/CustomerService.Application/
+COPY Services/CustomerService/CustomerService.Domain/CustomerService.Domain.csproj Services/CustomerService/CustomerService.Domain/
 
-COPY ../../../../Shared ./Shared
-COPY ../CustomerService.Application ./CustomerService.Application
-COPY ../CustomerService.Domain ./CustomerService.Domain
-COPY ../CustomerService.Infrastructure ./CustomerService.Infrastructure
-COPY . ./CustomerService.API
-COPY ../../OrderService/OrderService.Domain ./OrderService.Domain
+# Restore dependencies
+RUN dotnet restore Services/CustomerService/CustomerService.API/CustomerService.API.csproj
 
+# Copy the rest of the files
+COPY . .
 
-RUN dotnet restore "./CustomerService.API/CustomerService.API.csproj"
+# Build the app
+WORKDIR /src/Services/CustomerService/CustomerService.API
+RUN dotnet build CustomerService.API.csproj -c $BUILD_CONFIGURATION -o /app/build
 
-
-WORKDIR "/src/CustomerService.API"
-RUN dotnet build "CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
+# Publish stage
 FROM build AS publish
-RUN dotnet publish "CustomerService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish CustomerService.API.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Final stage
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .

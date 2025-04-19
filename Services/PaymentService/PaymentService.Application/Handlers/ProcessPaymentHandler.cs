@@ -1,11 +1,11 @@
 ﻿using MassTransit;
 using MediatR;
 using PaymentService.Application.Commands;
-using Shared.Events.Shared.Events;
+using Shared.Events;
 
 namespace PaymentService.Application.Handlers
 {
-    public class ProcessPaymentHandler : IRequestHandler<ProcessPaymentCommand>
+    public class ProcessPaymentHandler : IRequestHandler<ProcessPaymentCommand, bool>
     {
         private readonly IPublishEndpoint _publish;
 
@@ -14,15 +14,18 @@ namespace PaymentService.Application.Handlers
             _publish = publish;
         }
 
-        public async Task Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
         {
             //TODO: simulate payment
-            await Task.Delay(500);
 
-            await _publish.Publish(new OrderCreatedEvent
+            await Task.Delay(500, cancellationToken);
+
+            await _publish.Publish(new OrderPaidEvent
             {
                 OrderId = request.OrderId
-            });
+            }, cancellationToken);
+
+            return true;
         }
     }
 }

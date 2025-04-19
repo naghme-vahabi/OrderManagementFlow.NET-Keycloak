@@ -1,15 +1,7 @@
-using OrderService.Infrastructure.ApplicationDbContext;
-using Microsoft.EntityFrameworkCore;
-using OrderService.Domain.Interfaces;
-using MassTransit;
-using OrderService.Infrastructure.Repositories;
-using OrderService.Application.Handlers;
-using OrderService.Application.Interfaces;
+using Microsoft.OpenApi.Models;
 using OrderService.API.Middlewares;
-using OrderService.Infrastructure.Persistence.Interceptors;
 using OrderService.Application;
 using OrderService.Infrastructure;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

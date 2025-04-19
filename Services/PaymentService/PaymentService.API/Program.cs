@@ -1,31 +1,12 @@
-using MassTransit;
 using PaymentService.API.Middlewares;
-using PaymentService.Application.Handlers;
-using PaymentService.Infrastructure.Consumers;
+using PaymentService.Application;
+using PaymentService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<PaymentSucceededConsumer>();
-
-    x.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
-        {
-            h.Username(builder.Configuration["RabbitMQ:Username"]);
-            h.Password(builder.Configuration["RabbitMQ:Password"]);
-        });
-
-        cfg.ReceiveEndpoint("payment-succeeded-queue", e =>
-        {
-            e.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
-        });
-    });
-});
-
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ProcessPaymentHandler>());
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>

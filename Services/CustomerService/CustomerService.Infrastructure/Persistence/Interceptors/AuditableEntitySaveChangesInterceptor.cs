@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomerService.Domain.Common;
+﻿using CustomerService.Domain.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Security.Claims;
 
 namespace CustomerService.Infrastructure.Persistence.Interceptors
@@ -24,7 +19,7 @@ namespace CustomerService.Infrastructure.Persistence.Interceptors
             DbContextEventData eventData,
             InterceptionResult<int> result)
         {
-            UpdateEntities(eventData.Context);
+            UpdateEntities(eventData.Context!);
             return base.SavingChanges(eventData, result);
         }
 
@@ -33,7 +28,7 @@ namespace CustomerService.Infrastructure.Persistence.Interceptors
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            UpdateEntities(eventData.Context);
+            UpdateEntities(eventData.Context!);
             return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
@@ -42,7 +37,7 @@ namespace CustomerService.Infrastructure.Persistence.Interceptors
             if (context == null) return;
 
             var now = DateTime.Now;
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).ToString() ?? "System";
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "System";
 
             foreach (var entry in context.ChangeTracker.Entries<AuditableEntity>())
             {

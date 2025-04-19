@@ -15,10 +15,10 @@ namespace PaymentService.API.Controllers
         public PaymentsController(IMediator mediator) => _mediator = mediator;
 
         [HttpPost]
-        public async Task<IActionResult> Pay([FromBody] ProcessPaymentCommand command)
+        public async Task<IActionResult> Pay([FromBody] ProcessPaymentCommand command, CancellationToken cancellationToken)
         {
-            await _mediator.Send(command);
-            return Ok(new { status = "Success" });
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(new { Status = result ? "Success" : "Failed" });
         }
     }
 }

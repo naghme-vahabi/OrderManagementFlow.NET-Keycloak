@@ -16,13 +16,12 @@ namespace OrderService.Infrastructure.ApplicationDbContext
             _auditableEntityInterceptor = auditableEntityInterceptor;
         }
 
-        public DbSet<Order> Orders { get ; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            modelBuilder.Entity<Order>().OwnsMany(o => o.Items);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

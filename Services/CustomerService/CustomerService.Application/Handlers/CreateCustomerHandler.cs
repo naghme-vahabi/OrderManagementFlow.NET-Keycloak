@@ -2,11 +2,6 @@
 using CustomerService.Domain.Entities;
 using CustomerService.Domain.Interfaces;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerService.Application.Handlers
 {
@@ -27,7 +22,8 @@ namespace CustomerService.Application.Handlers
                 Email = request.Email
             };
 
-            await _customerRepository.AddAsync(customer);
+            await _customerRepository.AddAsync(customer, cancellationToken);
+
             return customer.Id;
         }
     }

@@ -1,18 +1,12 @@
 ﻿using CustomerService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using OrderService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerService.Application.Interfaces
 {
     public interface ICustomerDbContext
     {
         DbSet<Customer> Customers { get; set; }
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         int SaveChanges();
     }
 }

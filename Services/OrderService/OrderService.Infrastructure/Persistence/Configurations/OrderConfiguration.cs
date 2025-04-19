@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrderService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderService.Infrastructure.Persistence.Configurations
 {
@@ -17,7 +12,7 @@ namespace OrderService.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.Property(o => o.TotalAmount)
-                .HasPrecision(9,2)
+                .HasPrecision(9, 2)
                 .IsRequired();
 
             builder.HasMany(o => o.Items)

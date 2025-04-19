@@ -6,13 +6,13 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: orders
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ordersystem
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./keycloak-init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./keycloak-init:/docker-entrypoint-initdb.d
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -31,9 +31,9 @@ services:
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
-      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_DATABASE: ordersystem
       KC_DB_USERNAME: admin
-      KC_DB_PASSWORD: admin123
+      KC_DB_PASSWORD: admin
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
@@ -43,7 +43,8 @@ services:
 
   orderservice:
     build:
-      context: ./Services/OrderService/OrderService.API
+      context: .
+      dockerfile: Services/OrderService/OrderService.API/Dockerfile
     container_name: orderservice
     ports:
       - "5001:80"
@@ -58,7 +59,8 @@ services:
 
   paymentservice:
     build:
-      context: ./Services/PaymentService/PaymentService.API
+      context: .
+      dockerfile: Services/PaymentService/PaymentService.API/Dockerfile
     container_name: paymentservice
     ports:
       - "5002:80"
@@ -73,7 +75,8 @@ services:
 
   customerservice:
     build:
-      context: ./Services/CustomerService/CustomerService.API
+      context: .
+      dockerfile: Services/CustomerService/CustomerService.API/Dockerfile
     container_name: customerservice
     ports:
       - "5003:80"

@@ -1,11 +1,16 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PaymentService.Application.Commands
 {
-    public record ProcessPaymentCommand(Guid OrderId, string PaymentMethod) : IRequest;
+    public class ProcessPaymentCommand : IRequest<bool>
+    {
+        public ProcessPaymentCommand(Guid orderId, string paymentMethod)
+        {
+            OrderId = orderId;
+            PaymentMethod = paymentMethod;
+        }
+
+        public Guid OrderId { get; }
+        public string PaymentMethod { get; }
+    }
 }

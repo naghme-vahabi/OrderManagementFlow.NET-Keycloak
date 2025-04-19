@@ -2,29 +2,22 @@
 using OrderService.Application.Interfaces;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderService.Infrastructure.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
         private readonly IOrderDbContext _orderDbContext;
-        private readonly CancellationToken _cancellationToken;
 
-        public OrderRepository(IOrderDbContext orderDbContext,CancellationToken cancellationToken)
+        public OrderRepository(IOrderDbContext orderDbContext)
         {
             _orderDbContext = orderDbContext;
-            _cancellationToken = cancellationToken;
         }
 
-        public async Task<Guid> AddAsync(Order order)
+        public async Task<Guid> AddAsync(Order order, CancellationToken cancellationToken)
         {
-            await _orderDbContext.Orders.AddAsync(order);
-            await _orderDbContext.SaveChangesAsync(_cancellationToken);
+            await _orderDbContext.Orders.AddAsync(order, cancellationToken);
+            await _orderDbContext.SaveChangesAsync(cancellationToken);
             return order.Id;
         }
 
@@ -33,15 +26,15 @@ namespace OrderService.Infrastructure.Repositories
             return await _orderDbContext.Orders.Where(o => o.CustomerId == customerId).ToListAsync();
         }
 
-        public  async Task<Order?> GetByIdAsync(Guid orderId)
+        public async Task<Order?> GetByIdAsync(Guid orderId)
         {
             return await _orderDbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
-        public async Task UpdateAsync(Order order)
+        public async Task UpdateAsync(Order order, CancellationToken cancellationToken)
         {
             _orderDbContext.Orders.Update(order);
-            await _orderDbContext.SaveChangesAsync(_cancellationToken);
+            await _orderDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

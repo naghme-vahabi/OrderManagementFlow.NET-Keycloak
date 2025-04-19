@@ -1,17 +1,7 @@
 using CustomerService.API.Middlewares;
 using CustomerService.Application;
-using CustomerService.Application.Behaviors;
-using CustomerService.Application.Handlers;
-using CustomerService.Application.Interfaces;
-using CustomerService.Application.Validators;
-using CustomerService.Domain.Interfaces;
 using CustomerService.Infrastructure;
-using CustomerService.Infrastructure.ApplicationDbContext;
-using CustomerService.Infrastructure.Persistence.Interceptors;
-using CustomerService.Infrastructure.Repositories;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +15,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = builder.Configuration["Keycloak:Authority"];
         options.RequireHttpsMetadata = false;
-        options.Audience = builder.Configuration["Keycloak:Audience"] ;
+        options.Audience = builder.Configuration["Keycloak:Audience"];
     });
 
 builder.Services.AddAuthorization();
