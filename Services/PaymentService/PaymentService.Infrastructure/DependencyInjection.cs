@@ -25,6 +25,8 @@ namespace PaymentService.Infrastructure
                     cfg.ReceiveEndpoint("order-created-queue", e =>
                     {
                         e.ConfigureConsumer<OrderCreatedConsumer>(ctx);
+                        e.UseMessageRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
+                        e.UseDelayedRedelivery(r => r.Interval(2, TimeSpan.FromSeconds(10)));
                     });
                 });
             });

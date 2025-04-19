@@ -42,6 +42,9 @@ namespace OrderService.Infrastructure
                     cfg.ReceiveEndpoint("order-paid-queue", e =>
                     {
                         e.ConfigureConsumer<OrderPaidConsumer>(context);
+                        e.UseMessageRetry(r => r.Interval(5,TimeSpan.FromSeconds(5)));
+                        e.UseDelayedRedelivery(r => r.Interval(2, TimeSpan.FromSeconds(10)));
+
                     });
                 });
             });
